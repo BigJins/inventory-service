@@ -91,4 +91,12 @@ public class InventoryService implements InventoryManager {
             reservation.release();
         }
     }
+
+    @Override
+    @Transactional
+    public void addStock(Long productId, int quantity) {
+        Inventory inventory = inventoryRepository.findByProductId(productId)
+                .orElseThrow(() -> new IllegalArgumentException("재고 정보 없음: productId=" + productId));
+        inventory.addStock(quantity);
+    }
 }

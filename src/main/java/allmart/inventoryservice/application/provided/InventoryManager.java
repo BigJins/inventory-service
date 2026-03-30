@@ -37,5 +37,10 @@ public interface InventoryManager {
      */
     void release(String tossOrderId);
 
+    /**
+     * 판매자 입고 — 가용 재고를 추가한다.
+     */
+    void addStock(Long productId, int quantity);
+
     record ReserveItem(Long productId, int quantity) {}
 }
