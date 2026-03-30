@@ -96,7 +96,7 @@ public class InventoryService implements InventoryManager {
     @Transactional
     public void addStock(Long productId, int quantity) {
         Inventory inventory = inventoryRepository.findByProductId(productId)
-                .orElseThrow(() -> new IllegalArgumentException("재고 정보 없음: productId=" + productId));
+                .orElseGet(() -> inventoryRepository.save(Inventory.initialize(productId, 0)));
         inventory.addStock(quantity);
     }
 }
