@@ -1,6 +1,8 @@
 package allmart.inventoryservice.domain;
 
-import jakarta.persistence.*;
+import allmart.inventoryservice.config.SnowflakeGenerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
 
 @Getter
@@ -8,6 +10,6 @@ import lombok.Getter;
 public abstract class AbstractEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SnowflakeGenerated
     private Long id;
 }
