@@ -8,6 +8,7 @@ import allmart.inventoryservice.domain.inventory.Inventory;
 import allmart.inventoryservice.domain.inventory.InventoryReservation;
 import allmart.inventoryservice.domain.inventory.ReservationStatus;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class InventoryService implements InventoryManager {
@@ -43,6 +45,7 @@ public class InventoryService implements InventoryManager {
 
     /**
      * Redis DECRBY로 원자적 재고 차감 — SELECT FOR UPDATE 락 제거.
+     * Redis 키 없으면 DB에서 읽어 초기화 후 차감.
      * 하나라도 재고 부족이면 이미 차감한 항목을 INCRBY로 롤백 후 예외.
      */
     @Override
@@ -52,6 +55,7 @@ public class InventoryService implements InventoryManager {
         try {
             for (ReserveItem item : items) {
                 String key = STOCK_KEY + item.productId();
+                ensureRedisKeyExists(key, item.productId());
                 Long remaining = redisTemplate.opsForValue().decrement(key, item.quantity());
                 if (remaining == null || remaining < 0) {
                     int available = remaining == null ? 0 : (int) (remaining + item.quantity());
@@ -67,6 +71,24 @@ public class InventoryService implements InventoryManager {
                 redisTemplate.opsForValue().increment(STOCK_KEY + d.productId(), d.quantity());
             }
             throw e;
+        }
+    }
+
+    /**
+     * Redis 키가 없으면 DB에서 가용 재고를 읽어 초기화.
+     * (서비스 재시작 시 Redis 초기화가 실패한 경우 fallback)
+     */
+    private void ensureRedisKeyExists(String key, Long productId) {
+        if (Boolean.FALSE.equals(redisTemplate.hasKey(key))) {
+            inventoryRepository.findByProductId(productId).ifPresent(inv -> {
+                int pendingReserved = reservationRepository.findByStatus(ReservationStatus.PENDING).stream()
+                        .filter(r -> r.getProductId().equals(productId))
+                        .mapToInt(InventoryReservation::getQuantity)
+                        .sum();
+                int available = inv.getAvailableQuantity() - pendingReserved;
+                redisTemplate.opsForValue().setIfAbsent(key, String.valueOf(available));
+                log.info("Redis 키 fallback 초기화: productId={}, available={}", productId, available);
+            });
         }
     }
 
