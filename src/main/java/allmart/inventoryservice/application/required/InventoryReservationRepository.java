@@ -14,6 +14,8 @@ public interface InventoryReservationRepository extends Repository<InventoryRese
 
     List<InventoryReservation> findByTossOrderIdAndStatus(String tossOrderId, ReservationStatus status);
 
+    List<InventoryReservation> findByStatus(ReservationStatus status);
+
     // TTL 만료된 PENDING 예약 조회 (스케줄러 사용)
     @Query("SELECT r FROM InventoryReservation r WHERE r.status = :status AND r.expiredAt < :now")
     List<InventoryReservation> findExpired(ReservationStatus status, LocalDateTime now);
