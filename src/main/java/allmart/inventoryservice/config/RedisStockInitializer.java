@@ -35,6 +35,14 @@ public class RedisStockInitializer implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
+        try {
+            syncToRedis();
+        } catch (Exception e) {
+            log.warn("Redis 재고 초기화 실패 — 서비스는 계속 기동됩니다. 원인: {}", e.getMessage());
+        }
+    }
+
+    private void syncToRedis() {
         List<allmart.inventoryservice.domain.inventory.Inventory> inventories = inventoryRepository.findAll();
         if (inventories.isEmpty()) {
             log.info("재고 데이터 없음 — Redis 초기화 skip");
