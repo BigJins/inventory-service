@@ -41,6 +41,7 @@ public class InventoryService implements InventoryManager {
         });
         inventoryRepository.save(Inventory.initialize(productId, quantity));
         redisTemplate.opsForValue().set(STOCK_KEY + productId, String.valueOf(quantity));
+        log.info("재고 초기화 완료: productId={}, quantity={}", productId, quantity);
     }
 
     /**
@@ -67,11 +68,13 @@ public class InventoryService implements InventoryManager {
                 );
             }
         } catch (InsufficientStockException e) {
+            log.warn("재고 부족 - 예약 롤백: tossOrderId={}, 롤백 항목 수={}", tossOrderId, decremented.size());
             for (ReserveItem d : decremented) {
                 redisTemplate.opsForValue().increment(STOCK_KEY + d.productId(), d.quantity());
             }
             throw e;
         }
+        log.info("재고 예약 완료: tossOrderId={}, 항목 수={}", tossOrderId, items.size());
     }
 
     /**
@@ -103,6 +106,7 @@ public class InventoryService implements InventoryManager {
         for (InventoryReservation reservation : pending) {
             reservation.confirm();
         }
+        log.info("재고 확정 완료: tossOrderId={}, 확정 항목 수={}", tossOrderId, pending.size());
     }
 
     /**
@@ -117,6 +121,7 @@ public class InventoryService implements InventoryManager {
             redisTemplate.opsForValue().increment(STOCK_KEY + reservation.getProductId(), reservation.getQuantity());
             reservation.release();
         }
+        log.warn("재고 예약 해제 (결제 실패/취소): tossOrderId={}, 해제 항목 수={}", tossOrderId, pending.size());
     }
 
     @Override
@@ -126,5 +131,6 @@ public class InventoryService implements InventoryManager {
                 .orElseGet(() -> inventoryRepository.save(Inventory.initialize(productId, 0)));
         inventory.addStock(quantity);
         redisTemplate.opsForValue().increment(STOCK_KEY + productId, quantity);
+        log.info("재고 추가: productId={}, 추가량={}, 이후 DB 재고={}", productId, quantity, inventory.getAvailableQuantity());
     }
 }
