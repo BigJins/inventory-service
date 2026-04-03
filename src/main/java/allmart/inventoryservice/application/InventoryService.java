@@ -58,11 +58,12 @@ public class InventoryService implements InventoryManager {
                 String key = STOCK_KEY + item.productId();
                 ensureRedisKeyExists(key, item.productId());
                 Long remaining = redisTemplate.opsForValue().decrement(key, item.quantity());
+                // DECRBY가 이미 실행됐으므로 실패해도 해당 항목을 롤백 대상에 포함
+                decremented.add(item);
                 if (remaining == null || remaining < 0) {
                     int available = remaining == null ? 0 : (int) (remaining + item.quantity());
                     throw new InsufficientStockException(item.productId(), item.quantity(), available);
                 }
-                decremented.add(item);
                 reservationRepository.save(
                         InventoryReservation.pending(tossOrderId, item.productId(), item.quantity())
                 );
