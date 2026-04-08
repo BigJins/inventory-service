@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<entity-mappings
-        xmlns="https://jakarta.ee/xml/ns/persistence/orm"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence/orm
-                            https://jakarta.ee/xml/ns/persistence/orm/orm_3_1.xsd"
-        version="3.1">
+<entity-mappings xmlns="http://www.hibernate.org/xsd/orm/mapping"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://www.hibernate.org/xsd/orm/mapping
+                                     https://hibernate.org/xsd/orm/mapping/mapping-3.1.0.xsd">
 
-    <entity class="allmart.inventoryservice.domain.inventory.Inventory" access="FIELD">
+    <access>FIELD</access>
+
+    <entity class="allmart.inventoryservice.domain.inventory.Inventory">
         <table name="inventories">
             <index name="idx_inventory_product_id" column-list="product_id"/>
         </table>
@@ -26,7 +26,7 @@
         </attributes>
     </entity>
 
-    <entity class="allmart.inventoryservice.domain.inventory.InventoryReservation" access="FIELD">
+    <entity class="allmart.inventoryservice.domain.inventory.InventoryReservation">
         <table name="inventory_reservations">
             <index name="idx_reservation_toss_order_id" column-list="toss_order_id"/>
         </table>
