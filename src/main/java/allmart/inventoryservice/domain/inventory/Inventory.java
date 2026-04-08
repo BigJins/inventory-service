@@ -2,7 +2,7 @@ package allmart.inventoryservice.domain.inventory;
 
 import allmart.inventoryservice.domain.AbstractEntity;
 import allmart.inventoryservice.domain.exception.InsufficientStockException;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,22 +19,14 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(
-        name = "inventories",
-        indexes = @Index(name = "idx_inventories_product_id", columnList = "product_id")
-)
 public class Inventory extends AbstractEntity {
 
-    @Column(name = "product_id", nullable = false, unique = true)
     private Long productId;
 
-    @Column(name = "available_quantity", nullable = false)
     private int availableQuantity;
 
-    @Column(name = "reserved_quantity", nullable = false)
     private int reservedQuantity;
 
-    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
     public static Inventory initialize(Long productId, int quantity) {

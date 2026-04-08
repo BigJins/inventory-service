@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings
+        xmlns="https://jakarta.ee/xml/ns/persistence/orm"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence/orm
+                            https://jakarta.ee/xml/ns/persistence/orm/orm_3_1.xsd"
+        version="3.1">
+
+    <entity class="allmart.inventoryservice.domain.inventory.Inventory" access="FIELD">
+        <table name="inventories">
+            <index name="idx_inventory_product_id" column-list="product_id"/>
+        </table>
+        <attributes>
+            <basic name="productId">
+                <column name="product_id" nullable="false" unique="true"/>
+            </basic>
+            <basic name="availableQuantity">
+                <column name="available_quantity" nullable="false"/>
+            </basic>
+            <basic name="reservedQuantity">
+                <column name="reserved_quantity" nullable="false"/>
+            </basic>
+            <basic name="updatedAt">
+                <column name="updated_at" nullable="false"/>
+            </basic>
+        </attributes>
+    </entity>
+
+    <entity class="allmart.inventoryservice.domain.inventory.InventoryReservation" access="FIELD">
+        <table name="inventory_reservations">
+            <index name="idx_reservation_toss_order_id" column-list="toss_order_id"/>
+        </table>
+        <attributes>
+            <basic name="tossOrderId">
+                <column name="toss_order_id" nullable="false" length="64"/>
+            </basic>
+            <basic name="productId">
+                <column name="product_id" nullable="false"/>
+            </basic>
+            <basic name="quantity">
+                <column name="quantity" nullable="false"/>
+            </basic>
+            <basic name="status">
+                <column name="status" nullable="false" length="20"/>
+                <enumerated>STRING</enumerated>
+            </basic>
+            <basic name="createdAt">
+                <column name="created_at" nullable="false"/>
+            </basic>
+            <basic name="expiredAt">
+                <column name="expired_at" nullable="false"/>
+            </basic>
+        </attributes>
+    </entity>
+
+</entity-mappings>
