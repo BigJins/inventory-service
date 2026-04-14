@@ -53,4 +53,26 @@
         </attributes>
     </entity>
 
+
+    <entity class="allmart.inventoryservice.domain.event.OutboxEvent">
+        <table name="outbox_event"/>
+        <attributes>
+            <basic name="eventType">
+                <column name="event_type" nullable="false" length="64"/>
+            </basic>
+            <basic name="aggregateId">
+                <column name="aggregate_id" nullable="false" length="64"/>
+            </basic>
+            <basic name="aggregateType">
+                <column name="aggregate_type" nullable="false" length="32"/>
+            </basic>
+            <basic name="payload">
+                <column name="payload" nullable="false" column-definition="TEXT"/>
+            </basic>
+            <basic name="createdAt">
+                <column name="created_at" nullable="false"/>
+            </basic>
+        </attributes>
+    </entity>
+
 </entity-mappings>
