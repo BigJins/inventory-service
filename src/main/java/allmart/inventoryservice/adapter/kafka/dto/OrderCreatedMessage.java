@@ -8,5 +8,9 @@ public record OrderCreatedMessage(
         String tossOrderId,
         List<OrderLineDto> orderLines
 ) {
+    public OrderCreatedMessage {
+        orderLines = List.copyOf(orderLines);
+    }
+
     public record OrderLineDto(String productId, int quantity) {}
 }

@@ -68,4 +68,4 @@ jobs:
             sudo kubectl set image deployment/inventory-service \
               inventory-service=646596232446.dkr.ecr.ap-northeast-2.amazonaws.com/inventory-service:${{ github.sha }} \
               -n allmart
-            sudo kubectl rollout status deployment/inventory-service -n allmart --timeout=120s
+            sudo kubectl rollout status deployment/inventory-service -n allmart --timeout=300s
